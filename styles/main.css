@@ -18,25 +18,6 @@ body {
     vertical-align: bottom;
 }
 
-#outcomes {
-    width: 25px;
-    text-align: right;
-    margin-right: 10px;
-    display: none;
-}
-
-#content {
-    padding-bottom: 65px;
-}
-
-#advancementName {
-    margin-right: 5px;
-}
-
-#addAdvancementModal {
-    margin-right: 5px;
-}
-
 #blanket {
     visibility: hidden;
     position: fixed;
@@ -49,8 +30,7 @@ body {
     height: 100%;
 }
 
-#resetGameModal {
-    padding: 10px;
+.modal {
     overflow: hidden;
     text-align: center;
     font-size: 18px;
@@ -59,73 +39,22 @@ body {
     z-index: 9999;
     visibility: hidden;
     background: #fff;
+    margin: 0;
+    min-height: 150px;
 }
 
-#outcomeResultModal {
-    padding: 10px;
-    overflow: hidden;
-    text-align: center;
-    font-size: 18px;
-    border: 1px solid #000;
-    position: fixed;
-    z-index: 9999;
-    visibility: hidden;
-    background: #fff;
-    vertical-align: middle;
-}
-
-#outcomeResultModal .outcome {
-    display: block;
-}
-
-#resetGameModal span {
-    margin: 0 5px 0 5px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-}
-
-#newAdvancementModal span, .selection {
-    font-family: 'Courier' ;
-    font-weight: bold ;
+.button {
+    font-family: Courier, sans-serif;
+    font-weight: bold;
     padding: 5px;
     border: 1px solid black ;
     -moz-border-radius: 8px ;
     -webkit-border-radius: 8px ;
-    margin-top: 10px ;
-    margin-bottom: 10px ;
     background-color: white ;
     color: #000;
     cursor: pointer;
-}
-
-#newAdvancementModal span {
     display: inline-block;
-}
-
-#newAdvancementModal span.disabled {
-    cursor: default;
-    color: #ccc;
-    border: 1px solid #ccc;
-}
-
-.selection {
-    display: inline-block;
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-#newAdvancementModal {
-    padding: 10px;
-    overflow: auto;
-    text-align: center;
-    font-size: 16px;
-    border: 1px solid #000;
-    position: fixed;
-    z-index: 9999;
-    visibility: hidden;
-    background: #fff;
-    vertical-align: middle;
+    margin: 10px 5px;
 }
 
 #numberOfOutcomes {
@@ -134,16 +63,45 @@ body {
     margin-bottom: 5px;
 }
 
-#numberOfOutcomes span {
+#numberOfOutcomes .button {
     width: 10%;
     background: #eee;
 }
 
-#numberOfOutcomes span.selected {
+#numberOfOutcomes .selected {
     border: 4px #00f solid;
     background: #fff;
 }
 
-#numberOfOutcomes span.warning {
+#numberOfOutcomes .warning {
     border: 4px #f00 solid;
+}
+
+.modalContent {
+}
+
+.modalSelection {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    margin: 0px;
+    border-top: 1px solid #ccc;
+}
+
+.modalSelection span:first-child {
+    border-right: 1px solid #ccc;
+}
+
+.modalSelection span {
+    width: 50%;
+    display: block;
+    float: left;
+    padding: 5px 0px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.disabled {
+    cursor: default !important;
+    color: #ccc;
 }

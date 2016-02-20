@@ -1,10 +1,17 @@
 (function() {
 
+    // GRAY - CNES
+    // BLUE - NASA
+    // RED - OKB-1
+    // YELLOW - SAC
+    // WHITE - ISAS
+
     // Utility variables
+    var footer = document.querySelector('#footer');
+    var mainContent = document.querySelector('#mainContent');
+
     var addAdvancementButton = document.querySelector('#addAdvancementButton');
     var changeMode = document.querySelector('#changeMode');
-
-    var mainContent = document.querySelector('#mainContent');
 
     var resetButton = document.querySelector('#resetButton');
     var resetGameModal = document.querySelector('#resetGameModal');
@@ -19,11 +26,35 @@
     var shuffleOutcomesButton = outcomeResultModal.querySelector('#shuffleOutcomesButton');
     var removeOutcomeButton = outcomeResultModal.querySelector('#removeOutcomeButton');
 
+    var agencies = {
+        p1 : {
+            name : 'NASA',
+            mainColor : '#0099ff'
+        },
+        p2 : {
+            name : '&#1054;&#1050;&#1041;-1',
+            mainColor : '#ff4d4d'
+        },
+        p3 : {
+            name : 'SAC',
+            mainColor : '#ffff66'
+        },
+        p4 : {
+            name : 'CNES',
+            mainColor : '#737373'
+        },
+        p5 : {
+            name : 'ISAS',
+            mainColor : '#f2f2f2'
+        }
+    };
+
     var blanket = document.querySelector('#blanket');
 
     var clickEvent = navigator.userAgent.indexOf('iPhone') > -1 || navigator.userAgent.indexOf('iPad') > -1 ? 'touchend' : 'click';
 
     var activeAdvancements = {};
+    var currentState;
 
     var shuffleArray = function (array) {
         var i, j, temp;
@@ -78,11 +109,10 @@
         };
     };
 
-    var currentState = window.Storage && window.localStorage.getItem('storedState') ? JSON.parse(window.localStorage.getItem('storedState')) : initCurrentState();
-
     var setConfigValues = function () {
         var viewWidth = document.documentElement.clientWidth;
         var config = currentState.config;
+        var footerColor;
 
         if (config.mode === 'normal') {
             config.containerWidth = viewWidth < 350 ? viewWidth - 25 : 325;
@@ -125,7 +155,9 @@
             if (player.advancements.hasOwnProperty(prop)) {
                 for (i = 0; i < spans.length; i++) {
                     if (player.advancements[prop].name === spans[i].getAttribute('data-name')) {
-                        spans[i].className = 'disabled';
+                        if (spans[i].className.indexOf('disabled') === -1) {
+                            addClassName(spans[i], 'disabled');
+                        }
                     }
                 }
             }
@@ -135,7 +167,7 @@
     var createNewAdvancement = function () {
         blanket.style.visibility = 'visible';
         clearAdvancementModalSelections();
-        numberOfOutcomes.querySelector('[data-number="3"]').className += ' selected';
+        addClassName(numberOfOutcomes.querySelector('[data-number="3"]'), 'selected');
         disableUsedAdvancements(currentState.players[currentState.currentPlayer]);
         setupModal(newAdvancementModal);
     };
@@ -150,6 +182,33 @@
             window.localStorage.removeItem('storedState');
         }
         window.location.reload();
+    };
+
+    var removeClassName = function(el, classname) {
+        el.className = el.className.replace(classname, '').replace(/\s$/, '');
+    };
+
+    var addClassName = function(el, classname) {
+        el.className += ' ' + classname;
+    }
+
+    var clearState = function() {
+        var svgs = document.querySelectorAll('svg');
+        var disabledAdvancements = document.querySelectorAll('#newAdvancementModal span.disabled');
+        var i, len;
+        for (i = 0, len = svgs.length; i < len; i++) {
+            SVG(svgs[i]).remove();
+        }
+        for (i = 0, len = disabledAdvancements.length; i < len; i++) {
+            removeClassName(disabledAdvancements[i], 'disabled');
+        }
+        activeAdvancements = {};
+        updateStorage();
+    };
+
+    var changePlayer = function() {
+        clearState();
+        initPage();
     };
 
     var cancelBlanket = function () {
@@ -178,10 +237,10 @@
         var selected = numberOfOutcomes.querySelector('span.selected');
         var warning = numberOfOutcomes.querySelector('span.warning');
         if (selected) {
-            selected.className = selected.className.replace('selected', '').replace(/\s$/, '');
+            removeClassName(selected, 'selected');
         }
         if (warning) {
-            warning.className = warning.className.replace('warning', '').replace(/\s$/, '');
+            removeClassName(warning, 'warning');
         }
     };
 
@@ -197,7 +256,7 @@
             if (maximum < outcomes) {
                 temp = numberOfOutcomes.querySelector('[data-number="' + maximum + '"]');
                 if (temp.className.indexOf('warning') === -1) {
-                    temp.className += ' warning';
+                   addClassName(temp, 'warning');
                 }
             } else {
                 advancement = {
@@ -219,7 +278,7 @@
 
         if (target.className.indexOf('number') > -1 && target.className.indexOf('selected') === -1) {
             clearAdvancementModalSelections();
-            target.className += ' selected';
+            addClassName(target, 'selected');
         }
     };
 
@@ -314,8 +373,9 @@
     };
 
     var styleOutcomeResultsModalButtons = function() {
-        shuffleOutcomesButton.style.marginTop = outcomeResultModal.offsetHeight-200 + "px";
-        removeOutcomeButton.style.marginTop = outcomeResultModal.offsetHeight-200 + "px";
+        if (shuffleOutcomesButton.className.indexOf('disabled') > -1) {
+            removeClassName(shuffleOutcomesButton, 'disabled');
+        }
         shuffleOutcomesButton.style.visibility = 'visible';
         removeOutcomeButton.style.visibility = 'visible';
     };
@@ -336,11 +396,10 @@
 
             var outcomeSuccess = function() {
                 if (final) {
+                    addClassName(shuffleOutcomesButton, 'disabled');
+                    shuffleOutcomesButton.removeEventListener(clickEvent, shuffleOutcomes);
                     outcomeContent.innerHTML = 'Final Success!<br/><br/>Click anywhere to remove.';
-                    shuffleOutcomesButton.style.visibility = 'hidden';
-                    removeOutcomeButton.style.visibility = 'hidden';
                     blanket.addEventListener(clickEvent, removeTopOutcome);
-                    outcomeResultModal.addEventListener(clickEvent, removeTopOutcome);
                 } else {
                     outcomeContent.innerHTML = 'Success!';
                     blanket.addEventListener(clickEvent, shuffleOutcomes);
@@ -348,9 +407,6 @@
             };
 
             var outcomeFailure = function() {
-                if (final) {
-
-                }
                 blanket.addEventListener(clickEvent, shuffleOutcomes);
                 if (topOutcome < 76) {
                     outcomeContent.innerHTML = 'Minor Failure!';
@@ -491,7 +547,14 @@
         }
     };
 
+    var setColors = function() {
+        var color = agencies[currentState.currentPlayer].mainColor;
+        footer.style.backgroundColor = color;
+    };
+
     var initPage = function() {
+        currentState = window.Storage && window.localStorage.getItem('storedState') ? JSON.parse(window.localStorage.getItem('storedState')) : initCurrentState();
+        setColors();
         setConfigValues();
         setEventListeners();
         createAdvancements();

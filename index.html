@@ -18,45 +18,48 @@
             <div id="mainContent">
             </div>
             <div id="footer">
-                <span class="selection" id="changeMode">!</span><span class="selection" id="addAdvancementButton">+ Advancement</span><span class="selection" id="resetButton">Reset</span>
+                <span class="button" id="changeMode">NASA</span><span class="button" id="addAdvancementButton">+ Advancement</span><span class="button" id="resetButton">Reset</span>
             </div>
         </div>
+
         <div id="blanket"></div>
 
         <div id="resetGameModal" class="modal">
-            <p>Reset the game?</p>
-            <p id="resetChoice"><span id="resetModalYesButton" class="selection">Yes</span><span id="resetModalCancelButton" class="selection">Cancel</span></p>
+            <p class="modalContent">Reset the game?</p>
+            <p class="modalSelection"><span id="resetModalYesButton">Yes</span><span id="resetModalCancelButton">Cancel</span></p>
         </div>
 
         <div id="outcomeResultModal" class="modal">
-            <p>
+            <p class="modalContent">
                 <span id="outcomeContent"></span>
             </p>
-            <p>
-                <span id="shuffleOutcomesButton" class="selection">Shuffle</span>
-                <span id="removeOutcomeButton" class="selection">Remove $</span>
+            <p class="modalSelection">
+                <span id="shuffleOutcomesButton">Shuffle</span>
+                <span id="removeOutcomeButton">Remove</span>
             </p>
         </div>
+
+        <div id="showAdvancementModal" class="modal"></div>
 
         <div id="newAdvancementModal" class="modal">
             <div id="numberOfOutcomes">
-                <span class="number" data-number="0">0</span>
-                <span class="number" data-number="1">1</span>
-                <span class="number" data-number="2">2</span>
-                <span class="number selected" data-number="3">3</span>
+                <span class="number button" data-number="0">0</span>
+                <span class="number button" data-number="1">1</span>
+                <span class="number button" data-number="2">2</span>
+                <span class="number button selected" data-number="3">3</span>
             </div>
-            <span class="advancement" data-name="Juno Rocket">Juno Rocket</span>
-            <span class="advancement" data-name="Atlas Rocket">Atlas Rocket</span>
-            <span class="advancement" data-name="Soyuz Rocket">Soyuz Rocket</span>
-            <span class="advancement" data-name="Saturn Rocket">Saturn Rocket</span>
-            <span class="advancement" data-name="Ion Thruster">Ion Thruster</span>
-            <span class="advancement" data-name="Rendezvous">Rendezvous</span>
-            <span class="advancement" data-name="Re-entry">Re-entry</span>
-            <span class="advancement" data-name="Landing">Landing</span>
-            <span class="advancement" data-name="Life Support">Life Support</span>
-            <span class="advancement" data-name="Surveying">Surveying</span>
+            <span class="advancement button" data-name="Juno Rocket">Juno Rocket</span>
+            <span class="advancement button" data-name="Atlas Rocket">Atlas Rocket</span>
+            <span class="advancement button" data-name="Soyuz Rocket">Soyuz Rocket</span>
+            <span class="advancement button" data-name="Saturn Rocket">Saturn Rocket</span>
+            <span class="advancement button" data-name="Ion Thruster">Ion Thruster</span>
+            <span class="advancement button" data-name="Rendezvous">Rendezvous</span>
+            <span class="advancement button" data-name="Re-entry">Re-entry</span>
+            <span class="advancement button" data-name="Landing">Landing</span>
+            <span class="advancement button" data-name="Life Support">Life Support</span>
+            <span class="advancement button" data-name="Surveying">Surveying</span>
         </div>
 
-        <script src="scripts/outcomes.min.js" type="text/javascript"></script>
+        <script src="scripts/outcomes.js" type="text/javascript"></script>
     </body>
 </html>
