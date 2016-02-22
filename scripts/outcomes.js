@@ -6,12 +6,18 @@
     // YELLOW - SAC
     // WHITE - ISAS
 
+    var version = '210216';
+
     // Utility variables
     var footer = document.querySelector('#footer');
     var mainContent = document.querySelector('#mainContent');
 
     var addAdvancementButton = document.querySelector('#addAdvancementButton');
-    var changeMode = document.querySelector('#changeMode');
+    var showSettingsModalButton = document.querySelector('#showSettingsModalButton');
+
+    var settingsModal = document.querySelector('#settingsModal');
+    var normalViewButton = document.querySelector('#normalViewButton');
+    var compactViewButton = document.querySelector('#compactViewButton');
 
     var resetButton = document.querySelector('#resetButton');
     var resetGameModal = document.querySelector('#resetGameModal');
@@ -27,25 +33,30 @@
     var removeOutcomeButton = outcomeResultModal.querySelector('#removeOutcomeButton');
 
     var agencies = {
-        p1 : {
+        nasa : {
             name : 'NASA',
-            mainColor : '#0099ff'
+            bgColor : '#0099ff',
+            fgColor : '#fff'
         },
-        p2 : {
+        okb1 : {
             name : '&#1054;&#1050;&#1041;-1',
-            mainColor : '#ff4d4d'
+            bgColor : '#ff4d4d',
+            fgColor: '#fff'
         },
-        p3 : {
+        sac : {
             name : 'SAC',
-            mainColor : '#ffff66'
+            bgColor : '#ffff66',
+            fgColor : '#000'
         },
-        p4 : {
+        cnes : {
             name : 'CNES',
-            mainColor : '#737373'
+            bgColor : '#737373',
+            fgColor : '#fff'
         },
-        p5 : {
+        isas : {
             name : 'ISAS',
-            mainColor : '#f2f2f2'
+            bgColor : '#f2f2f2',
+            fgColor : '#000'
         }
     };
 
@@ -78,31 +89,27 @@
 
     var initCurrentState = function () {
         return {
+            version: version,
             config: {
                 mode: 'normal'
             },
-            currentPlayer: 'p1',
+            currentPlayer: 'nasa',
             outcomesDeck: initOutcomes(),
             discardDeck: [],
             players: {
-                p1: {
-                    name: 'Player 1',
+                nasa: {
                     advancements: {}
                 },
-                p2: {
-                    name: 'Player 2',
+                okb1: {
                     advancements: {}
                 },
-                p3: {
-                    name: 'Player 3',
+                sac: {
                     advancements: {}
                 },
-                p4: {
-                    name: 'Player 4',
+                cnes: {
                     advancements: {}
                 },
-                p5: {
-                    name: 'Player 5',
+                isas: {
                     advancements: {}
                 }
             }
@@ -112,7 +119,6 @@
     var setConfigValues = function () {
         var viewWidth = document.documentElement.clientWidth;
         var config = currentState.config;
-        var footerColor;
 
         if (config.mode === 'normal') {
             config.containerWidth = viewWidth < 350 ? viewWidth - 25 : 325;
@@ -185,12 +191,12 @@
     };
 
     var removeClassName = function(el, classname) {
-        el.className = el.className.replace(classname, '').replace(/\s$/, '');
+        el.className = el.className.replace(new RegExp(classname, 'g'), '').replace(/\s$/, '');
     };
 
     var addClassName = function(el, classname) {
         el.className += ' ' + classname;
-    }
+    };
 
     var clearState = function() {
         var svgs = document.querySelectorAll('svg');
@@ -206,22 +212,20 @@
         updateStorage();
     };
 
-    var changePlayer = function() {
+    var changePlayer = function(e) {
+        currentState.currentPlayer = e.target.id;
+        cancelBlanket();
         clearState();
         initPage();
     };
 
     var cancelBlanket = function () {
         var i;
-        try {
-            var modals = document.querySelectorAll('.modal');
-            for (i = 0; i < modals.length; i++) {
-                modals[i].style.visibility = 'hidden';
-            }
-            shuffleOutcomesButton.style.visibility = 'inherit';
-            removeOutcomeButton.style.visibility = 'inherit';
-            blanket.style.visibility = 'hidden';
-        }catch(e) { alert(e.message); }
+        var modals = document.querySelectorAll('.modal');
+        for (i = 0; i < modals.length; i++) {
+            modals[i].style.visibility = 'hidden';
+        }
+        blanket.style.visibility = 'hidden';
     };
 
     var guid = function () {
@@ -253,12 +257,21 @@
         if (target.className.indexOf('advancement') > -1 && target.className.indexOf('disabled') === -1) {
             maximum = currentState.config.maximumOutcomes[target.getAttribute('data-name')];
             outcomes = selectedNumber.getAttribute('data-number');
+
             if (maximum < outcomes) {
                 temp = numberOfOutcomes.querySelector('[data-number="' + maximum + '"]');
                 if (temp.className.indexOf('warning') === -1) {
                    addClassName(temp, 'warning');
                 }
             } else {
+
+                // If there are not enough outcomes in the outcome or discard deck
+                if (currentState.outcomesDeck.length + currentState.discardDeck.length < outcomes) {
+                    cancelBlanket();
+                    clearAdvancementModalSelections();
+                    return;
+                }
+
                 advancement = {
                     player: currentState.currentPlayer,
                     id: id,
@@ -282,19 +295,53 @@
         }
     };
 
-    var changeViewMode = function() {
-        currentState.config.mode = currentState.config.mode === 'normal' ? 'compact' : 'normal';
-        updateStorage();
-        window.location.reload();
+    var showSettingsModal = function() {
+        changeViewModeSelection();
+        blanket.style.visibility = 'visible';
+        setupModal(settingsModal);
+    };
+
+    var changeViewModeSelection = function() {
+        if (currentState.config.mode === 'normal') {
+            removeClassName(normalViewButton, 'disabled');
+            addClassName(compactViewButton, 'disabled');
+        }
+        if (currentState.config.mode === 'compact') {
+            removeClassName(compactViewButton, 'disabled');
+            addClassName(normalViewButton, 'disabled');
+        }
+        clearState();
+        initPage();
+    };
+
+    var settingsModalHandler = function(e) {
+        if (e.target.id === 'normalViewButton' && currentState.config.mode === 'compact') {
+            currentState.config.mode = 'normal';
+            changeViewModeSelection();
+        }
+        if (e.target.id === 'compactViewButton' && currentState.config.mode === 'normal') {
+            currentState.config.mode = 'compact';
+            changeViewModeSelection();
+        }
+        if (e.target.id in agencies) {
+            if (e.target.id !== currentState.currentPlayer) {
+                changePlayer(e);
+            } else {
+                cancelBlanket();
+            }
+        }
     };
 
     var setEventListeners = function () {
         addAdvancementButton.addEventListener(clickEvent, createNewAdvancement);
-        resetButton.addEventListener(clickEvent, resetGameSetup);
-        changeMode.addEventListener(clickEvent, changeViewMode);
+
+        showSettingsModalButton.addEventListener(clickEvent, showSettingsModal);
 
         newAdvancementModal.addEventListener(clickEvent, newAdvancementModalHandler);
 
+        settingsModal.addEventListener(clickEvent, settingsModalHandler);
+
+        resetButton.addEventListener(clickEvent, resetGameSetup);
         resetModalYesButton.addEventListener(clickEvent, removeStorageAndReset);
         resetModalCancelButton.addEventListener(clickEvent, cancelBlanket);
 
@@ -324,20 +371,24 @@
                 y: 15,
                 fill: '#fff',
                 stroke: '#000'
+            })
+            .radius(3);
+        container.text(name)
+            .attr({
+                x: currentState.config.advancementMargin,
+                y: currentState.config.outcomeMargin
+            })
+            .font({
+                family: 'Helvetica',
+                size : currentState.config.advancementFontSize
             });
-        container.text(name).attr({
-            x: currentState.config.advancementMargin,
-            y: currentState.config.outcomeMargin
-        }).font({
-            family: 'Courier',
-            size : currentState.config.advancementFontSize
-        });
-        container.image('img/0.png').attr({
-            width: currentState.config.outcomeDimension,
-            height: currentState.config.outcomeDimension,
-            x: currentState.config.outcomeMargin,
-            y: currentState.config.outcomeMargin
-        });
+        container.image('img/0.png')
+            .attr({
+                width: currentState.config.outcomeDimension,
+                height: currentState.config.outcomeDimension,
+                x: currentState.config.outcomeMargin,
+                y: currentState.config.outcomeMargin
+            });
         return container;
     };
 
@@ -355,20 +406,23 @@
                 break;
         }
         return {
-            outcomeCard: container.rect(currentState.config.outcomeDimension, currentState.config.outcomeDimension).attr({
-                x: currentState.config.outcomeMargin,
-                y: currentState.config.outcomeMargin,
-                fill: '#fff',
-                stroke: '#000',
-                id: id
-            }),
-            outcomeImage: container.image(path).attr({
-                width: currentState.config.outcomeDimension,
-                height: currentState.config.outcomeDimension,
-                x: currentState.config.outcomeMargin,
-                y: currentState.config.outcomeMargin,
-                id: id
-            })
+            outcomeCard: container.rect(currentState.config.outcomeDimension, currentState.config.outcomeDimension)
+                .attr({
+                    x: currentState.config.outcomeMargin,
+                    y: currentState.config.outcomeMargin,
+                    fill: '#fff',
+                    stroke: '#000',
+                    id: id
+                })
+                .radius(3),
+            outcomeImage: container.image(path)
+                .attr({
+                    width: currentState.config.outcomeDimension,
+                    height: currentState.config.outcomeDimension,
+                    x: currentState.config.outcomeMargin,
+                    y: currentState.config.outcomeMargin,
+                    id: id
+                })
         }
     };
 
@@ -376,8 +430,6 @@
         if (shuffleOutcomesButton.className.indexOf('disabled') > -1) {
             removeClassName(shuffleOutcomesButton, 'disabled');
         }
-        shuffleOutcomesButton.style.visibility = 'visible';
-        removeOutcomeButton.style.visibility = 'visible';
     };
 
     var Advancement = function(advancement) {
@@ -395,13 +447,12 @@
             var final = that.outcomesDeck.members.length === 1;
 
             var outcomeSuccess = function() {
+                outcomeContent.innerHTML = 'Success!';
                 if (final) {
                     addClassName(shuffleOutcomesButton, 'disabled');
                     shuffleOutcomesButton.removeEventListener(clickEvent, shuffleOutcomes);
-                    outcomeContent.innerHTML = 'Final Success!<br/><br/>Click anywhere to remove.';
                     blanket.addEventListener(clickEvent, removeTopOutcome);
                 } else {
-                    outcomeContent.innerHTML = 'Success!';
                     blanket.addEventListener(clickEvent, shuffleOutcomes);
                 }
             };
@@ -486,12 +537,7 @@
         this.showFinalCard = function() {
             var final = this.outcomesDeck.members.length === 1;
             var finalOutcome = this.outcomesDeck.last().attr('outcome');
-            var path;
-            if (currentState.config.mode === 'normal') {
-                path = finalOutcome < 76 ? 'img/minor.png' : 'img/major.png';
-            } else {
-                path = finalOutcome < 76 ? 'img/minor-compact.png' : 'img/major-compact.png';
-            }
+            var path = finalOutcome < 76 ? 'img/minor.png' : 'img/major.png';
             if (final) {
                 this.outcomesDeck.last().get(1).load(path);
             }
@@ -500,10 +546,10 @@
         // Add cards until maxLength is reached
         while (this.outcomes.length < this.maxLength) {
             // If the outcomes deck runs out, reset it
+            // Then, add first card in the outcomes deck to this advancement
             if (!currentState.outcomesDeck.length) {
                 redoOutcomesDeck();
             }
-            // Add first card in the outcomes deck to this advancement
             this.outcomes.push(currentState.outcomesDeck.shift());
         }
 
@@ -547,20 +593,26 @@
         }
     };
 
-    var setColors = function() {
-        var color = agencies[currentState.currentPlayer].mainColor;
-        footer.style.backgroundColor = color;
+    var setFooter = function() {
+        var bgColor = agencies[currentState.currentPlayer].bgColor;
+        var fgColor = agencies[currentState.currentPlayer].fgColor;
+        footer.style.backgroundColor = bgColor;
+        footer.style.color = fgColor;
+        showSettingsModalButton.innerHTML = agencies[currentState.currentPlayer].name;
     };
 
     var initPage = function() {
-        currentState = window.Storage && window.localStorage.getItem('storedState') ? JSON.parse(window.localStorage.getItem('storedState')) : initCurrentState();
-        setColors();
+        currentState = window.Storage && window.localStorage.getItem('storedState') ? JSON.parse(window.localStorage.getItem('storedState')) : {};
+        if (currentState.version !== version) {
+            currentState = initCurrentState();
+        }
+        setFooter();
         setConfigValues();
         setEventListeners();
         createAdvancements();
         updateStorage();
-        FastClick.attach(document.body);
     };
 
     initPage();
+    FastClick.attach(document.body);
 })();

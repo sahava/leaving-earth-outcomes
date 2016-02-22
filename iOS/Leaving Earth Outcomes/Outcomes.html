@@ -2,63 +2,61 @@
     <head>
         <title>Leaving Earth - Outcome Management App</title>
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="default">
-        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-
-        <script src="deps/svg.js" type="text/javascript"></script>
-        <script src="deps/fastclick.js" type="text/javascript"></script>
-
-        <link rel="stylesheet" href="styles/main.css"/>
-
-        <script src="scripts/ga.js" type="text/javascript"></script>
-
-    </head>
+            <meta name="apple-mobile-web-app-status-bar-style" content="default">
+                <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+                    
+                    <script src="deps/svg.js" type="text/javascript"></script>
+                    <script src="deps/fastclick.js" type="text/javascript"></script>
+                    
+                    <link rel="stylesheet" href="styles/main.css"/>
+                    
+                    </head>
     <body>
         <div id="wrapper">
             <div id="mainContent">
             </div>
             <div id="footer">
                 <p class="footerNavi">
-                    <span id="showSettingsModalButton">NASA</span>
-                    <span id="addAdvancementButton">+ Advancement</span>
-                    <span id="resetButton">Reset</span>
+                <span id="showSettingsModalButton">NASA</span>
+                <span id="addAdvancementButton">+ Advancement</span>
+                <span id="resetButton">Reset</span>
                 </p>
             </div>
         </div>
-
+        
         <div id="blanket"></div>
-
+        
         <div id="settingsModal" class="modal">
             <p class="modalContent">
-                Choose the view mode:<br/>
-                <span class="button" id="normalViewButton">Normal</span><span class="button" id="compactViewButton">Compact</span>
+            Choose the view mode:<br/>
+            <span class="button" id="normalViewButton">Normal</span><span class="button" id="compactViewButton">Compact</span>
             </p>
             <p class="modalSelection" id="agencySelection">
-                <span id="nasa">NASA</span>
-                <span id="okb1">&#1054;&#1050;&#1041;-1</span>
-                <span id="sac">SAC</span>
-                <span id="cnes">CNES</span>
-                <span id="isas">ISAS</span>
+            <span id="nasa">NASA</span>
+            <span id="okb1">&#1054;&#1050;&#1041;-1</span>
+            <span id="sac">SAC</span>
+            <span id="cnes">CNES</span>
+            <span id="isas">ISAS</span>
             </p>
         </div>
-
+        
         <div id="resetGameModal" class="modal">
             <p class="modalContent">Reset the game?</p>
             <p class="modalSelection"><span id="resetModalYesButton">Yes</span><span id="resetModalCancelButton">Cancel</span></p>
         </div>
-
+        
         <div id="outcomeResultModal" class="modal">
             <p class="modalContent">
-                <span id="outcomeContent"></span>
+            <span id="outcomeContent"></span>
             </p>
             <p class="modalSelection">
-                <span id="shuffleOutcomesButton">Shuffle</span>
-                <span id="removeOutcomeButton">Remove</span>
+            <span id="shuffleOutcomesButton">Shuffle</span>
+            <span id="removeOutcomeButton">Remove</span>
             </p>
         </div>
-
+        
         <div id="showAdvancementModal" class="modal"></div>
-
+        
         <div id="newAdvancementModal" class="modal">
             <div id="numberOfOutcomes">
                 <span class="number button" data-number="0">0</span>
@@ -77,7 +75,7 @@
             <span class="advancement button" data-name="Life Support">Life Support</span>
             <span class="advancement button" data-name="Surveying">Surveying</span>
         </div>
-
+        
         <script src="scripts/outcomes.min.js" type="text/javascript"></script>
     </body>
 </html>
