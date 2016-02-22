@@ -43,6 +43,13 @@ body {
     box-shadow: 5px 5px 3px #ccc;
 }
 
+.modal .close {
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    cursor: pointer;
+}
+
 .button {
     font-weight: bold;
     padding: 5px;

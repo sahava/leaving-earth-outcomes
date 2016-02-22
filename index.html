@@ -29,6 +29,7 @@
         <div id="blanket"></div>
 
         <div id="settingsModal" class="modal">
+            <span class="close">&#10007;</span>
             <p class="modalContent">
                 Choose the view mode:<br/>
                 <span class="button" id="normalViewButton">Normal</span><span class="button" id="compactViewButton">Compact</span>
@@ -43,11 +44,13 @@
         </div>
 
         <div id="resetGameModal" class="modal">
+            <span class="close">&#10007;</span>
             <p class="modalContent">Reset the game?</p>
             <p class="modalSelection"><span id="resetModalYesButton">Yes</span><span id="resetModalCancelButton">Cancel</span></p>
         </div>
 
         <div id="outcomeResultModal" class="modal">
+            <span class="close">&#10007;</span>
             <p class="modalContent">
                 <span id="outcomeContent"></span>
             </p>
@@ -57,9 +60,17 @@
             </p>
         </div>
 
-        <div id="showAdvancementModal" class="modal"></div>
+        <div id="showAdvancementModal" class="modal">
+            <span class="close">&#10007;</span>
+            <p class="modalContent"></p>
+            <p class="modalSelection">
+                <span id="discardAdvancement">Discard</span>
+                <span id="cancelAdvancement">Cancel</span>
+            </p>
+        </div>
 
         <div id="newAdvancementModal" class="modal">
+            <span class="close">&#10007;</span>
             <div id="numberOfOutcomes">
                 <span class="number button" data-number="0">0</span>
                 <span class="number button" data-number="1">1</span>

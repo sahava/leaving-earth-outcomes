@@ -6,7 +6,7 @@
     // YELLOW - SAC
     // WHITE - ISAS
 
-    var version = '210216';
+    var version = '220216';
 
     // Utility variables
     var footer = document.querySelector('#footer');
@@ -26,6 +26,7 @@
 
     var newAdvancementModal = document.querySelector('#newAdvancementModal');
     var numberOfOutcomes = document.querySelector('#numberOfOutcomes');
+    var showAdvancementModal = document.querySelector('#showAdvancementModal');
 
     var outcomeResultModal = document.querySelector('#outcomeResultModal');
     var outcomeContent = outcomeResultModal.querySelector('#outcomeContent');
@@ -146,6 +147,9 @@
     };
 
     var setupModal = function (modal) {
+        var close = modal.querySelector('.close');
+        close.removeEventListener(clickEvent, cancelBlanket);
+        close.addEventListener(clickEvent, cancelBlanket);
         modal.style.width = currentState.config.dialogWidth + 'px';
         modal.style.bottom = '50%';
         modal.style.left = '50%';
@@ -296,12 +300,12 @@
     };
 
     var showSettingsModal = function() {
-        changeViewModeSelection();
+        setupViewModeSelection();
         blanket.style.visibility = 'visible';
         setupModal(settingsModal);
     };
 
-    var changeViewModeSelection = function() {
+    var setupViewModeSelection = function() {
         if (currentState.config.mode === 'normal') {
             removeClassName(normalViewButton, 'disabled');
             addClassName(compactViewButton, 'disabled');
@@ -310,6 +314,10 @@
             removeClassName(compactViewButton, 'disabled');
             addClassName(normalViewButton, 'disabled');
         }
+    };
+
+    var changeViewModeSelection = function() {
+        setupViewModeSelection();
         clearState();
         initPage();
     };
@@ -442,7 +450,8 @@
         this.finalRevealed = advancement.finalRevealed;
         this.id = advancement.id;
 
-        this.showOutcomeResult = function() {
+        this.showOutcomeResult = function(e) {
+            e.stopPropagation();
             var topOutcome = that.outcomesDeck.last().attr('outcome');
             var final = that.outcomesDeck.members.length === 1;
 
@@ -543,6 +552,28 @@
             }
         };
 
+        this.discardAdvancement = function() {
+            var i, len;
+            for (i = 0, len = that.outcomes.length; i < len; i++) {
+                currentState.discardDeck.push(that.outcomes[i]);
+            }
+            delete currentState.players[currentState.currentPlayer].advancements[that.id];
+            clearState();
+            initPage();
+            cancelBlanket();
+        };
+
+        this.setupShowAdvancementModal = function() {
+            var content = showAdvancementModal.querySelector('.modalContent');
+            var cancelButton = showAdvancementModal.querySelector('#cancelAdvancement');
+            var discardButton = showAdvancementModal.querySelector('#discardAdvancement');
+            cancelButton.addEventListener(clickEvent, cancelBlanket);
+            discardButton.addEventListener(clickEvent, that.discardAdvancement);
+            content.innerHTML = that.name;
+            blanket.style.visibility = 'visible';
+            setupModal(showAdvancementModal);
+        };
+
         // Add cards until maxLength is reached
         while (this.outcomes.length < this.maxLength) {
             // If the outcomes deck runs out, reset it
@@ -579,11 +610,7 @@
 
         this.outcomesDeck.on('click', this.showOutcomeResult);
 
-        return {
-            outcomesDeck : this.outcomesDeck,
-            showFinalCard : this.showFinalCard,
-            showOutcomeResult : this.showOutcomeResult
-        }
+        this.advancementContainer.on('click', this.setupShowAdvancementModal);
     };
 
     var updateStorage = function() {
