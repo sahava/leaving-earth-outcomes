@@ -6,7 +6,7 @@
     // YELLOW - SAC
     // WHITE - ISAS
 
-    var version = '220216';
+    var version = '060316';
 
     // Utility variables
     var footer = document.querySelector('#footer');
@@ -68,6 +68,7 @@
     var activeAdvancements = {};
     var currentState;
 
+    // Utility to shuffle any Array
     var shuffleArray = function (array) {
         var i, j, temp;
         for (i = array.length - 1; i > 0; i--) {
@@ -79,6 +80,7 @@
         return array;
     };
 
+    // Create initial outcomes deck
     var initOutcomes = function () {
         var temp = [];
         var i;
@@ -88,6 +90,7 @@
         return shuffleArray(temp);
     };
 
+    // Unitialize new state
     var initCurrentState = function () {
         return {
             version: version,
@@ -117,6 +120,7 @@
         };
     };
 
+    // Set configuration for device, and maximum outcomes for advancement types
     var setConfigValues = function () {
         var viewWidth = document.documentElement.clientWidth;
         var config = currentState.config;
@@ -146,6 +150,7 @@
         };
     };
 
+    // Utility for loading a modal dialog
     var setupModal = function (modal) {
         var close = modal.querySelector('.close');
         close.removeEventListener(clickEvent, cancelBlanket);
@@ -158,6 +163,7 @@
         modal.style.visibility = 'visible';
     };
 
+    // Disabled advancement selections that have already been bought
     var disableUsedAdvancements = function (player) {
         var spans = newAdvancementModal.querySelectorAll('span');
         var prop, i;
@@ -174,6 +180,7 @@
         }
     };
 
+    // Setup the new advancement creation modal
     var createNewAdvancement = function () {
         blanket.style.visibility = 'visible';
         clearAdvancementModalSelections();
@@ -182,11 +189,13 @@
         setupModal(newAdvancementModal);
     };
 
+    // Setup the modal for game reset
     var resetGameSetup = function () {
         blanket.style.visibility = 'visible';
         setupModal(resetGameModal);
     };
 
+    // Remove storage, reset the game
     var removeStorageAndReset = function () {
         if (window.Storage) {
             window.localStorage.removeItem('storedState');
@@ -194,14 +203,17 @@
         window.location.reload();
     };
 
+    // Utility for removing a class from an element
     var removeClassName = function(el, classname) {
         el.className = el.className.replace(new RegExp(classname, 'g'), '').replace(/\s$/, '');
     };
 
+    // Utility for adding a class to an element
     var addClassName = function(el, classname) {
         el.className += ' ' + classname;
     };
 
+    // Clear the state of the page without a reload or storage removal
     var clearState = function() {
         var svgs = document.querySelectorAll('svg');
         var disabledAdvancements = document.querySelectorAll('#newAdvancementModal span.disabled');
@@ -216,6 +228,7 @@
         updateStorage();
     };
 
+    // Change the player based on selection
     var changePlayer = function(e) {
         currentState.currentPlayer = e.target.id;
         cancelBlanket();
@@ -223,6 +236,7 @@
         initPage();
     };
 
+    // Cancel the full-screen blanket
     var cancelBlanket = function () {
         var i;
         var modals = document.querySelectorAll('.modal');
@@ -232,6 +246,7 @@
         blanket.style.visibility = 'hidden';
     };
 
+    // Create a random GUID
     var guid = function () {
         var s4 = function () {
             return Math.floor((1 + Math.random()) * 0x10000)
@@ -241,6 +256,7 @@
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
     };
 
+    // Clear selections in outcome numbers
     var clearAdvancementModalSelections = function () {
         var selected = numberOfOutcomes.querySelector('span.selected');
         var warning = numberOfOutcomes.querySelector('span.warning');
@@ -252,12 +268,14 @@
         }
     };
 
+    // Handler for events on the advancement creation modal
     var newAdvancementModalHandler = function (e) {
         var target = e.target;
         var id = guid();
         var selectedNumber = numberOfOutcomes.querySelector('span.selected');
         var temp, outcomes, maximum, advancement;
 
+        // If click is on an advancement button
         if (target.className.indexOf('advancement') > -1 && target.className.indexOf('disabled') === -1) {
             maximum = currentState.config.maximumOutcomes[target.getAttribute('data-name')];
             outcomes = selectedNumber.getAttribute('data-number');
@@ -269,13 +287,14 @@
                 }
             } else {
 
-                // If there are not enough outcomes in the outcome or discard deck
+                // If there are not enough outcomes in the outcome or discard deck, do nothing
                 if (currentState.outcomesDeck.length + currentState.discardDeck.length < outcomes) {
                     cancelBlanket();
                     clearAdvancementModalSelections();
                     return;
                 }
 
+                // New advancement settings
                 advancement = {
                     player: currentState.currentPlayer,
                     id: id,
@@ -293,18 +312,21 @@
             }
         }
 
+        // If click is on the outcome number
         if (target.className.indexOf('number') > -1 && target.className.indexOf('selected') === -1) {
             clearAdvancementModalSelections();
             addClassName(target, 'selected');
         }
     };
 
+    // Setup settings modal
     var showSettingsModal = function() {
         setupViewModeSelection();
         blanket.style.visibility = 'visible';
         setupModal(settingsModal);
     };
 
+    // Setup view mode selection
     var setupViewModeSelection = function() {
         if (currentState.config.mode === 'normal') {
             removeClassName(normalViewButton, 'disabled');
@@ -316,12 +338,14 @@
         }
     };
 
+    // Handle view mode selection without reload
     var changeViewModeSelection = function() {
         setupViewModeSelection();
         clearState();
         initPage();
     };
 
+    // Handler for events in the settings modal
     var settingsModalHandler = function(e) {
         if (e.target.id === 'normalViewButton' && currentState.config.mode === 'compact') {
             currentState.config.mode = 'normal';
@@ -331,6 +355,8 @@
             currentState.config.mode = 'compact';
             changeViewModeSelection();
         }
+
+        // Player change
         if (e.target.id in agencies) {
             if (e.target.id !== currentState.currentPlayer) {
                 changePlayer(e);
@@ -340,6 +366,7 @@
         }
     };
 
+    // Setup common event listeners on the page
     var setEventListeners = function () {
         addAdvancementButton.addEventListener(clickEvent, createNewAdvancement);
 
@@ -356,6 +383,7 @@
         blanket.addEventListener(clickEvent, cancelBlanket);
     };
 
+    // Create new advancements from current state
     var createAdvancements = function () {
         var prop;
         var advancements = currentState.players[currentState.currentPlayer].advancements;
@@ -366,11 +394,13 @@
         }
     };
 
+    // If outcomes deck runs out, create a new one from discard deck
     var redoOutcomesDeck = function () {
         currentState.outcomesDeck = shuffleArray(currentState.discardDeck);
         currentState.discardDeck = [];
     };
 
+    // Draw the SVG container for an advancement
     var drawAdvancementContainer = function (name) {
         var container = SVG(mainContent).size(currentState.config.containerWidth, currentState.config.containerHeight);
         container.rect(currentState.config.advancementWidth, currentState.config.advancementHeight)
@@ -400,6 +430,7 @@
         return container;
     };
 
+    // Draw the SVG container for a single outcome card
     var drawOutcome = function (i, container, id) {
         var path;
         switch (i) {
@@ -434,12 +465,14 @@
         }
     };
 
+    // Re-enable the shuffle button on the outcomes modal
     var styleOutcomeResultsModalButtons = function() {
         if (shuffleOutcomesButton.className.indexOf('disabled') > -1) {
             removeClassName(shuffleOutcomesButton, 'disabled');
         }
     };
 
+    // Object for a new Advancement
     var Advancement = function(advancement) {
         var i, len, temp, tempGroup;
         var that = this;
@@ -450,17 +483,22 @@
         this.finalRevealed = advancement.finalRevealed;
         this.id = advancement.id;
 
+        // Method for showing the result of an outcome card
         this.showOutcomeResult = function(e) {
             e.stopPropagation();
             var topOutcome = that.outcomesDeck.last().attr('outcome');
             var final = that.outcomesDeck.members.length === 1;
+            var close;
 
+            // If successful and last card, only make it possible to remove the card
             var outcomeSuccess = function() {
                 outcomeContent.innerHTML = 'Success!';
                 if (final) {
                     addClassName(shuffleOutcomesButton, 'disabled');
                     shuffleOutcomesButton.removeEventListener(clickEvent, shuffleOutcomes);
                     blanket.addEventListener(clickEvent, removeTopOutcome);
+                    close.removeEventListener(clickEvent, shuffleOutcomes);
+                    close.addEventListener(clickEvent, removeTopOutcome);
                 } else {
                     blanket.addEventListener(clickEvent, shuffleOutcomes);
                 }
@@ -475,6 +513,7 @@
                 }
             };
 
+            // Method for shuffling outcomes back into the advancement
             var shuffleOutcomes = function() {
                 var id = that.id;
                 var temp = [];
@@ -492,9 +531,11 @@
                     i++;
                 });
                 updateStorage();
+                close.removeEventListener(clickEvent, shuffleOutcomes);
                 resetOutcomeResults();
             };
 
+            // Remove the outcome if it is researched
             var removeTopOutcome = function() {
                 var id = that.id;
                 var members, i;
@@ -511,9 +552,11 @@
                 currentState.players[currentState.currentPlayer].advancements[id].maxLength = maxLength;
                 currentState.discardDeck.push(topOutcome);
                 updateStorage();
+                close.removeEventListener(close, removeTopOutcome);
                 resetOutcomeResults();
             };
 
+            // Reset the modal after the modal has been closed
             var resetOutcomeResults = function() {
                 blanket.removeEventListener(clickEvent, shuffleOutcomes);
                 blanket.removeEventListener(clickEvent, removeTopOutcome);
@@ -533,6 +576,11 @@
             styleOutcomeResultsModalButtons();
             setupModal(outcomeResultModal);
 
+            // Change the behavior of the X button to shuffle the outcomes by default
+            close = outcomeResultModal.querySelector('.close');
+            close.removeEventListener(clickEvent, cancelBlanket);
+            close.addEventListener(clickEvent, shuffleOutcomes);
+
             // remove default behavior of clicking the blanket
             blanket.removeEventListener(clickEvent, cancelBlanket);
 
@@ -543,6 +591,7 @@
             }
         };
 
+        // If it's the final card and it's a known failure, show it all the time
         this.showFinalCard = function() {
             var final = this.outcomesDeck.members.length === 1;
             var finalOutcome = this.outcomesDeck.last().attr('outcome');
@@ -552,6 +601,7 @@
             }
         };
 
+        // Discard the selected advancement
         this.discardAdvancement = function() {
             var i, len;
             for (i = 0, len = that.outcomes.length; i < len; i++) {
@@ -563,12 +613,13 @@
             cancelBlanket();
         };
 
+        // Setup the modal shown when an advancement is clicked
         this.setupShowAdvancementModal = function() {
             var content = showAdvancementModal.querySelector('.modalContent');
             var cancelButton = showAdvancementModal.querySelector('#cancelAdvancement');
             var discardButton = showAdvancementModal.querySelector('#discardAdvancement');
             cancelButton.addEventListener(clickEvent, cancelBlanket);
-            discardButton.addEventListener(clickEvent, that.discardAdvancement);
+            discardButton.addEventListener('click', that.discardAdvancement);
             content.innerHTML = that.name;
             blanket.style.visibility = 'visible';
             setupModal(showAdvancementModal);
@@ -608,11 +659,13 @@
             this.showFinalCard();
         }
 
+        // Add listeners to clicks on the outcomes cards on an advancement, as well as the advancement itself
         this.outcomesDeck.on('click', this.showOutcomeResult);
 
         this.advancementContainer.on('click', this.setupShowAdvancementModal);
     };
 
+    // Update storage with current state
     var updateStorage = function() {
         if (window.Storage) {
             window.localStorage.removeItem('storedState');
@@ -620,6 +673,7 @@
         }
     };
 
+    // Setup the footer navigation
     var setFooter = function() {
         var bgColor = agencies[currentState.currentPlayer].bgColor;
         var fgColor = agencies[currentState.currentPlayer].fgColor;
@@ -628,6 +682,7 @@
         showSettingsModalButton.innerHTML = agencies[currentState.currentPlayer].name;
     };
 
+    // Initialize the page and all parts of it
     var initPage = function() {
         currentState = window.Storage && window.localStorage.getItem('storedState') ? JSON.parse(window.localStorage.getItem('storedState')) : {};
         if (currentState.version !== version) {
@@ -641,5 +696,7 @@
     };
 
     initPage();
+
+    // Use FastClick to improve 'click' in mobile
     FastClick.attach(document.body);
 })();
