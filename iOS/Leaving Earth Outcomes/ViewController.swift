@@ -19,6 +19,7 @@ class ViewController: UIViewController {
         let myWebView:UIWebView = UIWebView(frame: CGRectMake(0, 20, UIScreen.mainScreen().bounds.width, UIScreen.mainScreen().bounds.height))
         myWebView.loadRequest(request)
         myWebView.scrollView.bounces = false
+        
         self.view = myWebView
     }
 
